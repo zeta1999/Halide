@@ -4,7 +4,7 @@
 // #pragma message "The Halide Direct3D 12 back-end is not yet supported on 32bit targets..."
 #else  // BITS_64
 
-#include "runtime_internal.h"
+#include "runtime_internal.h"   // stdint, malloc, free, memset
 
 #define INCLUDING_FROM_D3D12WRAPPER_CPP
 #include "d3d12wrapper.h"

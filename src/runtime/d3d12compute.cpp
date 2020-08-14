@@ -41,6 +41,9 @@
 #endif
 
 #ifdef __clang__
+// suppressing the following warning:
+// '__stdcall' calling convention is not supported for this target [-Wignored-attributes]
+// which is dangerous, but still necessary until all D3D12 are stubbed in d3d12wrapper
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #endif
