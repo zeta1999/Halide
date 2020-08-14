@@ -165,7 +165,6 @@ foreach (i IN LISTS RUNTIME_CPP)
             else ()
                 # generic 64-bit code
                 set(TARGET "le64-unknown-unknown-unknown")
-				set(TARGET "x86_64-unknown-windows-unknown")
             endif ()
         endif ()
 

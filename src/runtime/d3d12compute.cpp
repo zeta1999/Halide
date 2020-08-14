@@ -40,7 +40,14 @@
 #define COBJMACROS
 #endif
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wignored-attributes"
+#endif
 #include "d3d12wrapper.h"
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 // For all intents and purposes, we always want to use COMPUTE command lists
 // (and queues) ...
