@@ -46,7 +46,7 @@ CLANG_TIDY_TARGETS=$(find \
      "${ROOT_DIR}/util" \
      "${ROOT_DIR}/python_bindings" \
      ! -path */DefaultCostModel.cpp \
-     -name *.cpp -o -name *.h -o -name *.c | sort | uniq)
+     -name *.cpp -o -name *.h -o -name *.c)
 
 ${RUN_CLANG_TIDY} \
     $1 \
