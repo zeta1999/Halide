@@ -67,7 +67,9 @@ ${RUN_CLANG_TIDY} \
     -clang-tidy-binary ${CLANG_TIDY_LLVM_INSTALL_DIR}/bin/clang-tidy \
     -clang-apply-replacements-binary ${CLANG_TIDY_LLVM_INSTALL_DIR}/bin/clang-apply-replacements \
     ${CLANG_TIDY_TARGETS} \
-    2>&1 | grep -v "warnings generated" | sed "s|.*/|.|"
+    2>&1 | grep -v "warnings generated"
+
+    #| sed "s|.*/|.|"
 
 RESULT=${PIPESTATUS[0]}
 echo run-clang-tidy finished with status ${RESULT}
