@@ -27,13 +27,26 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
       -DLLVM_DIR=${CLANG_TIDY_LLVM_INSTALL_DIR} \
       -S ${ROOT_DIR} \
       -B ${CLANG_TIDY_BUILD_DIR} \
+      -G Ninja \
       > /dev/null
 
 [ -a ${CLANG_TIDY_BUILD_DIR}/compile_commands.json ]
 
+# We must populate the includes directory to check things outside of src/
+ninja -C ${CLANG_TIDY_BUILD_DIR} HalideIncludes
+
 RUN_CLANG_TIDY=${CLANG_TIDY_LLVM_INSTALL_DIR}/share/clang/run-clang-tidy.py
 
-CLANG_TIDY_TARGETS="${ROOT_DIR}/src/*.cpp ${ROOT_DIR}/src/*.h"
+# We deliberately skip apps/ and test/ for now, as the compile commands won't include
+# generated headers files from Generators. We must also blocklist DefaultCostModel.cpp
+# as it relies on cost_model.h.
+CLANG_TIDY_TARGETS=$(find \
+     "${ROOT_DIR}/src" \
+     "${ROOT_DIR}/tools" \
+     "${ROOT_DIR}/util" \
+     "${ROOT_DIR}/python_bindings" \
+     ! -path */DefaultCostModel.cpp \
+     -name *.cpp -o -name *.h -o -name *.c)
 
 if [ $(uname -s) = "Darwin" ]; then
     LOCAL_CORES=`sysctl -n hw.ncpu`
@@ -43,7 +56,7 @@ fi
 
 ${RUN_CLANG_TIDY} \
     $1 \
-    -header-filter=.* \
+    -header-filter='.*(?!pybind11).*' \
     -j ${LOCAL_CORES} \
     -quiet \
     -p ${CLANG_TIDY_BUILD_DIR} \
@@ -52,5 +65,9 @@ ${RUN_CLANG_TIDY} \
     ${CLANG_TIDY_TARGETS} \
     2>&1 | grep -v "warnings generated" | sed "s|.*/||"
 
+RESULT=${PIPESTATUS[0]}
+echo run-clang-tidy finished with status ${RESULT}
+
 rm -rf ${CLANG_TIDY_BUILD_DIR}
 
+exit $RESULT
