@@ -33,7 +33,9 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
 [ -a ${CLANG_TIDY_BUILD_DIR}/compile_commands.json ]
 
 # We must populate the includes directory to check things outside of src/
-ninja -C ${CLANG_TIDY_BUILD_DIR} HalideIncludes
+ninja -C ${CLANG_TIDY_BUILD_DIR} HalideIncludes -v
+
+echo Done with HalideIncludes
 
 RUN_CLANG_TIDY=${CLANG_TIDY_LLVM_INSTALL_DIR}/share/clang/run-clang-tidy.py
 

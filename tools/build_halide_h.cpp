@@ -81,6 +81,7 @@ int main(int argc, char **files) {
     fprintf(stdout, "#define HALIDE_H\n\n");
 
     for (int i = 2; i < argc; i++) {
+        fprintf(stderr, "Processing %s...\n", files[i]);
         dump_header(files[i]);
     }
 
