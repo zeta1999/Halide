@@ -80,7 +80,7 @@ struct ModelWeight<true> : public GeneratorInput<Buffer<float>> {
         Expr smoothed_second_moment_correction = 1 / (1 - pow(0.999f, timestep + 1));
 
         // Update the weights
-        Expr step = std::move(learning_rate) * smoothed_deriv * smoothed_deriv_correction;
+        Expr step = learning_rate * smoothed_deriv * smoothed_deriv_correction;
         step /= sqrt(smoothed_second_moment * smoothed_second_moment_correction) + 1e-5f;
 
         new_weight = current_weight - step;
@@ -174,17 +174,17 @@ public:
     Func pad_stages(const Func &f, Expr stages) {
         Halide::Region bounds(f.dimensions());
         bounds[1].min = 0;
-        bounds[1].extent = std::move(stages);
+        bounds[1].extent = stages;
         return BoundaryConditions::constant_exterior(f, cast(f.value().type(), 0), bounds);
     }
 
     Expr activation(Expr e) {
         // relu
-        return max(std::move(e), 0);
+        return max(e, 0);
     }
 
     Expr sigmoid(Expr e) {
-        return 1 / (1 + exp(-std::move(e)));
+        return 1 / (1 + exp(-e));
     }
 
     void generate() {
@@ -352,7 +352,7 @@ public:
         Expr max_threads_hitting_same_page_fault = min(inner_parallelism, 4096 / max(1, innermost_bytes_at_task));
 
         // The total number of page faults is proportionate to the number of bytes allocated
-        const Expr &num_page_faults = bytes_at_production;
+        Expr num_page_faults = bytes_at_production;
 
         // And page faults are serviced serially, so the total CPU time gets multiplied by the thread count again!
         Expr cost_of_page_faults = (num_page_faults * max_threads_hitting_same_page_fault *
