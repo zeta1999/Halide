@@ -59,6 +59,7 @@ ${RUN_CLANG_TIDY} \
     2>&1 | grep -v "warnings generated"
 
 RESULT=${PIPESTATUS[0]}
+
 echo run-clang-tidy finished with status ${RESULT}
 
 rm -rf ${CLANG_TIDY_BUILD_DIR}
