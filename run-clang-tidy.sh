@@ -48,8 +48,6 @@ CLANG_TIDY_TARGETS=$(find \
      ! -path */DefaultCostModel.cpp \
      -name *.cpp -o -name *.h -o -name *.c | sort | uniq)
 
-echo CLANG_TIDY_TARGETS ${CLANG_TIDY_TARGETS}
-
 ${RUN_CLANG_TIDY} \
     $1 \
     -header-filter='.*(?!pybind11).*' \
