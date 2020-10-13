@@ -96,10 +96,10 @@ std::map<std::string, size_t> write_string_table(std::ostream &out,
     for (const llvm::NewArchiveMember &m : members) {
         std::string name = member_name(m);
         internal_assert(string_to_offset_map.count(name) == 0);
-        if (name.size() < 16 && name.find('/') == std::string::npos) {
+        if (name.size() < 16 && name.find('/') == std::string::npos)
             // small strings that don't contain '/' can be inlined
             continue;
-        }
+
         if (start_offset == 0) {
             emit_padded(out, "//", 16);
             finish_member_header(out, 0);
