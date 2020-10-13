@@ -35,8 +35,6 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
 # We must populate the includes directory to check things outside of src/
 ninja -C ${CLANG_TIDY_BUILD_DIR} HalideIncludes
 
-echo Done with HalideIncludes
-
 RUN_CLANG_TIDY=${CLANG_TIDY_LLVM_INSTALL_DIR}/share/clang/run-clang-tidy.py
 
 # We deliberately skip apps/ and test/ for now, as the compile commands won't include
@@ -48,7 +46,9 @@ CLANG_TIDY_TARGETS=$(find \
      "${ROOT_DIR}/util" \
      "${ROOT_DIR}/python_bindings" \
      ! -path */DefaultCostModel.cpp \
-     -name *.cpp -o -name *.h -o -name *.c)
+     -name *.cpp -o -name *.h -o -name *.c | sort | uniq)
+
+echo CLANG_TIDY_TARGETS ${CLANG_TIDY_TARGETS}
 
 ${RUN_CLANG_TIDY} \
     $1 \
@@ -58,7 +58,7 @@ ${RUN_CLANG_TIDY} \
     -clang-tidy-binary ${CLANG_TIDY_LLVM_INSTALL_DIR}/bin/clang-tidy \
     -clang-apply-replacements-binary ${CLANG_TIDY_LLVM_INSTALL_DIR}/bin/clang-apply-replacements \
     ${CLANG_TIDY_TARGETS} \
-    2>&1 | grep -v "warnings generated" | sed "s|.*/||"
+    2>&1 | grep -v "warnings generated"
 
 RESULT=${PIPESTATUS[0]}
 echo run-clang-tidy finished with status ${RESULT}
