@@ -33,7 +33,7 @@ cmake -DCMAKE_BUILD_TYPE=Debug \
 [ -a ${CLANG_TIDY_BUILD_DIR}/compile_commands.json ]
 
 # We must populate the includes directory to check things outside of src/
-ninja -C ${CLANG_TIDY_BUILD_DIR} HalideIncludes -v
+ninja -C ${CLANG_TIDY_BUILD_DIR} HalideIncludes
 
 echo Done with HalideIncludes
 
@@ -50,11 +50,15 @@ CLANG_TIDY_TARGETS=$(find \
      ! -path */DefaultCostModel.cpp \
      -name *.cpp -o -name *.h -o -name *.c)
 
+echo CLANG_TIDY_TARGETS are ${CLANG_TIDY_TARGETS}
+
 if [ $(uname -s) = "Darwin" ]; then
     LOCAL_CORES=`sysctl -n hw.ncpu`
 else
     LOCAL_CORES=`nproc`
 fi
+
+echo starting RUN_CLANG_TIDY with LOCAL_CORES = ${LOCAL_CORES}
 
 ${RUN_CLANG_TIDY} \
     $1 \
@@ -64,8 +68,9 @@ ${RUN_CLANG_TIDY} \
     -p ${CLANG_TIDY_BUILD_DIR} \
     -clang-tidy-binary ${CLANG_TIDY_LLVM_INSTALL_DIR}/bin/clang-tidy \
     -clang-apply-replacements-binary ${CLANG_TIDY_LLVM_INSTALL_DIR}/bin/clang-apply-replacements \
-    ${CLANG_TIDY_TARGETS} \
-    2>&1 | grep -v "warnings generated" | sed "s|.*/||"
+    ${CLANG_TIDY_TARGETS}
+
+    # 2>&1 | grep -v "warnings generated" | sed "s|.*/||"
 
 RESULT=${PIPESTATUS[0]}
 echo run-clang-tidy finished with status ${RESULT}
