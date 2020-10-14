@@ -6,6 +6,8 @@ ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 [[ "$1" != "" && "$1" != "-fix" ]] && echo "The only supported argument is -fix" && exit
 
+FIX=$1
+
 # We are currently standardized on using LLVM/Clang10 for this script.
 # Note that this is totally independent of the version of LLVM that you
 # are using to build Halide itself. If you don't have LLVM10 installed,
@@ -38,25 +40,28 @@ ninja -C ${CLANG_TIDY_BUILD_DIR} HalideIncludes
 RUN_CLANG_TIDY=${CLANG_TIDY_LLVM_INSTALL_DIR}/share/clang/run-clang-tidy.py
 
 # We deliberately skip apps/ and test/ for now, as the compile commands won't include
-# generated headers files from Generators. We must also blocklist DefaultCostModel.cpp
-# as it relies on cost_model.h.
+# generated headers files from Generators.
+#
+# Skip DefaultCostModel.cpp as it relies on cost_model.h.
+# Skip GenGen.cpp and RunGenMain.cpp as they bring clang-tidy to its knees.
 CLANG_TIDY_TARGETS=$(find \
      "${ROOT_DIR}/src" \
      "${ROOT_DIR}/tools" \
      "${ROOT_DIR}/util" \
      "${ROOT_DIR}/python_bindings" \
-     ! -path */DefaultCostModel.cpp \
+     ! -name DefaultCostModel.cpp \
+     ! -name GenGen.cpp \
+     ! -name RunGenMain.cpp \
      -name *.cpp -o -name *.h -o -name *.c)
 
 ${RUN_CLANG_TIDY} \
-    $1 \
-    -header-filter='.*(?!pybind11).*' \
+    ${FIX} \
     -quiet \
     -p ${CLANG_TIDY_BUILD_DIR} \
     -clang-tidy-binary ${CLANG_TIDY_LLVM_INSTALL_DIR}/bin/clang-tidy \
     -clang-apply-replacements-binary ${CLANG_TIDY_LLVM_INSTALL_DIR}/bin/clang-apply-replacements \
     ${CLANG_TIDY_TARGETS} \
-    2>&1 | grep -v "warnings generated"
+    2>&1 | grep -v "warnings generated" | sed "s|.*/||"
 
 RESULT=${PIPESTATUS[0]}
 

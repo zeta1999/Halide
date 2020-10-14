@@ -1,6 +1,14 @@
-# Note: if you make changes here, you may need to make changes in .clang-tidy
-# files elsewhere in the tree; clang-tidy-10 doesn't allow selective
-# inheritance of parent .clang-tidy files.
+# In clang-tidy-11 (or maybe clang-tidy-12) you can use
+#
+#  InheritParentConfig: true
+#
+# to just inherit from parent .clang-tidy files. Alas,
+# that isn't available in clang-tidy-10, so we must make copies
+# where specialization is needed.
+
+#
+# The desired change here is just to change HeaderFilterRegex.
+#
 
 ---
 Checks: >
@@ -19,6 +27,6 @@ Checks: >
     readability-braces-around-statements
 
 WarningsAsErrors: '*'
-HeaderFilterRegex: '.*'
+HeaderFilterRegex: '^((?!pybind11).)*$'
 FormatStyle: 'file'
 ...
